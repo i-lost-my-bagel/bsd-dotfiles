@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+CHECK_VAR=$(sysctl -n dev.hwpstate_intel.7.epp)
+
+if [ $1 == "set" ]; then
+	if [ $2 == "power-saver" ]; then
+		doas sysctl dev.hwpstate_intel.0.epp=70 
+		doas sysctl dev.hwpstate_intel.1.epp=100
+		doas sysctl dev.hwpstate_intel.2.epp=100
+		doas sysctl dev.hwpstate_intel.3.epp=100
+		doas sysctl dev.hwpstate_intel.4.epp=100
+		doas sysctl dev.hwpstate_intel.5.epp=100
+		doas sysctl dev.hwpstate_intel.6.epp=100
+		doas sysctl dev.hwpstate_intel.7.epp=100
+	elif [ $2 == "balanced" ]; then
+		doas sysctl dev.hwpstate_intel.0.epp=70
+		doas sysctl dev.hwpstate_intel.1.epp=70
+		doas sysctl dev.hwpstate_intel.2.epp=70
+		doas sysctl dev.hwpstate_intel.3.epp=70
+		doas sysctl dev.hwpstate_intel.4.epp=70
+		doas sysctl dev.hwpstate_intel.5.epp=70
+		doas sysctl dev.hwpstate_intel.6.epp=70
+		doas sysctl dev.hwpstate_intel.7.epp=70
+	elif [ $2 == "performance" ]; then
+		doas sysctl dev.hwpstate_intel.0.epp=20
+		doas sysctl dev.hwpstate_intel.1.epp=20
+		doas sysctl dev.hwpstate_intel.2.epp=20
+		doas sysctl dev.hwpstate_intel.3.epp=20
+		doas sysctl dev.hwpstate_intel.4.epp=20
+		doas sysctl dev.hwpstate_intel.5.epp=20
+		doas sysctl dev.hwpstate_intel.6.epp=20
+		doas sysctl dev.hwpstate_intel.7.epp=20
+	else
+		echo "Invalid option"
+		echo "Valid options: power-saver, balanced, performance"
+	fi
+
+elif [ $1 == "get" ]; then
+	if [ $CHECK_VAR == "20" ]; then
+		echo "performance"
+	elif [ $CHECK_VAR == "70" ]; then
+		echo "balanced"
+	elif [ $CHECK_VAR == "100" ]; then
+		echo "power-saver"
+	else
+		echo "idk"
+	fi	
+else
+	echo "Invalid option"
+	echo "Valid options: get, set"
+fi

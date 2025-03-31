@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+DATE=$(date +'%Y-%m-%d %l:%M %p')
+BAT_PERCENT=$(sysctl -n hw.acpi.battery.life)
+WIFI_NETWORK=$(wpa_cli status | sed -n -e 's/^.*\(^ssid=\)//p')
+POWERMAN_STATUS=$(powerctl get)
+
+if [ $(sysctl -n hw.acpi.battery.time) == "-1" ]; then
+	BAT_TIME_REMAINING="Charging"
+else
+	BAT_TIME_REMAINING="Time Remaining: $(sysctl -n hw.acpi.battery.time | awk '{printf("%02d:%02d\n",($1/60%60),($1%60))}')"
+fi
+
+playerctl metadata xesam:title > /dev/null
+if [ $? -ne 0 ] ; then
+	SONG_TITLE="no media playing"
+else
+	SONG_TITLE="$(playerctl metadata xesam:title) - $(playerctl metadata xesam:album) | $(playerctl metadata xesam:artist)"
+fi
+
+if [ $(echo $(acpiconf -i0 | grep "Present rate" | sed "s/[^0-9]//g")) == 0 ] ; then
+	CURRENT_RATE=$(printf %.3f $(echo $(acpiconf -i1 | grep "Present rate" | sed "s/[^0-9]//g")/1000 | bc -l))
+else
+	CURRENT_RATE=$(printf %.3f $(echo $(acpiconf -i0 | grep "Present rate" | sed "s/[^0-9]//g")/1000 | bc -l))
+fi
+
+echo "$SONG_TITLE | <span color='#ff0000'>$POWERMAN_STATUS</span> | <span color='#ff3333'>$WIFI_NETWORK</span> | <span color='#ff5555'>$CURRENT_RATE W</span> | <span color='#ff7777'>BAT: $BAT_PERCENT%</span> | <span color='#ff9999'>$BAT_TIME_REMAINING</span> | <span color='#ffbbbb'>$DATE</span>"
